@@ -21,6 +21,12 @@ async function findByUserId(userId: number) {
   });
 }
 
+async function countBookingsByRoomId(roomId: number) {
+  return prisma.booking.count({
+    where: { roomId }
+  });
+}
+
 async function upsertBooking({ id, roomId, userId }: UpdateBookingParams) {
   return prisma.booking.upsert({
     where: { id },
@@ -34,4 +40,5 @@ export const bookingRepository = {
   findByRoomId,
   findByUserId,
   upsertBooking,
+  countBookingsByRoomId,
 };
