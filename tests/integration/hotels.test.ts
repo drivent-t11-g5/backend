@@ -266,6 +266,7 @@ describe('GET /hotels/:hotelId', () => {
             name: createdRoom.name,
             capacity: createdRoom.capacity,
             hotelId: createdHotel.id,
+            availableBookings: expect.any(Number),
             createdAt: createdRoom.createdAt.toISOString(),
             updatedAt: createdRoom.updatedAt.toISOString(),
           },
