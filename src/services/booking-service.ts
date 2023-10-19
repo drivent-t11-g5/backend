@@ -16,6 +16,15 @@ async function validateUserBooking(userId: number) {
   }
 }
 
+async function countAvailableBookingsInRoom(roomId: number) {
+  const room = await roomRepository.findById(roomId);
+  if (!room) throw notFoundError();
+
+  const bookingsCount = await bookingRepository.countByRoomId(roomId);
+  
+  return room.capacity - bookingsCount;
+}
+
 async function checkValidBooking(roomId: number) {
   const room = await roomRepository.findById(roomId);
   if (!room) throw notFoundError();
@@ -57,4 +66,5 @@ export const bookingService = {
   bookRoomById,
   getBooking,
   changeBookingRoomById,
+  countAvailableBookingsInRoom,
 };
