@@ -22,8 +22,27 @@ async function getHotels(userId: number) {
 
   const hotels = await hotelRepository.findHotels();
   if (hotels.length === 0) throw notFoundError();
+  
+  const hotelsInfo = [];
 
-  return hotels;
+  for (let i=0; i<hotels.length; i++){
+    let availableBookings = 0;
+    const acomodation: String[] = [];
+    const hotelInfo = await getHotelsWithRooms(userId, hotels[i].id);
+    for (let j=0; j<hotelInfo.Rooms.length; j++){
+      availableBookings += hotelInfo.Rooms[j].availableBookings;
+      if (hotelInfo.Rooms[j].capacity == 1 && !acomodation.includes('Single')){
+        acomodation.push('Single');
+      } else if (hotelInfo.Rooms[j].capacity == 2 && !acomodation.includes('Double')){
+        acomodation.push('Double');
+      } else if (hotelInfo.Rooms[j].capacity == 3 && !acomodation.includes('Triple')){
+        acomodation.push('Triple');
+      }
+    }
+    hotelsInfo.push({...hotels[i], availableBookings, acomodation})
+  }
+
+  return hotelsInfo;
 }
 
 async function getHotelsWithRooms(userId: number, hotelId: number) {
