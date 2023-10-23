@@ -3,6 +3,7 @@ import { Booking, Payment, Ticket } from '@prisma/client';
 export type ApplicationError = {
   name: string;
   message: string;
+  data?: Ticket;
 };
 
 export type RequestError = {

@@ -3,7 +3,7 @@ import httpStatus from 'http-status';
 import { ApplicationError, RequestError } from '@/protocols';
 
 export function handleApplicationErrors(
-  err: RequestError | ApplicationError | Error,
+  err: RequestError | ApplicationError,
   _req: Request,
   res: Response,
   next: NextFunction,
@@ -59,7 +59,10 @@ export function handleApplicationErrors(
   }
 
   if (err.name === 'CannotListHotelsError') {
-    return res.status(httpStatus.PAYMENT_REQUIRED).send(err.message);
+    return res.status(httpStatus.PAYMENT_REQUIRED).send({
+      message: err.message,
+      data: err.data
+    });
   }
 
   if (err.name === 'CannotBookError') {
