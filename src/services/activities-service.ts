@@ -1,12 +1,18 @@
 import { NotAcceptable, notFoundError, paymentRequiredError } from '@/errors';
 import { ticketsRepository } from '@/repositories';
 import activitiesRepository from '@/repositories/activities-repository';
-import httpStatus from 'http-status';
 
 async function getActivities(userId: number) {
   const ticket = await ticketsRepository.findTicketById(userId);
-  if (ticket.status === 'RESERVED') throw paymentRequiredError();
-  if (!ticket.TicketType.includesHotel) throw NotAcceptable();
+  if (!ticket) {
+    throw paymentRequiredError();
+  }
+  if (ticket.status !== 'PAID') {
+    throw paymentRequiredError();
+  }
+  if (!ticket.TicketType.includesHotel) {
+    throw NotAcceptable();
+  }
 
   const activities = await activitiesRepository.getActivities();
   const occupiedSeats = await activitiesRepository.getOccupiedSeats();
@@ -23,6 +29,7 @@ async function getActivities(userId: number) {
 
   return activitiesWithOccupiedSeats;
 }
+
 
 async function postActivityToUser(userId:number, activityId: number){
   const activity = await activitiesRepository.getActivity(activityId);
