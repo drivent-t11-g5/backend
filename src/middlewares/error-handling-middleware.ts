@@ -66,6 +66,14 @@ export function handleApplicationErrors(
     return res.status(httpStatus.FORBIDDEN).send(err.message);
   }
 
+  if (err.name === 'paymentRequired') {
+    return res.status(httpStatus.PAYMENT_REQUIRED).send(err.message);
+  }
+
+  if (err.name === 'NotAcceptable') {
+    return res.status(httpStatus.NOT_ACCEPTABLE).send(err.message);
+  }
+
   if (err.hasOwnProperty('status') && err.name === 'RequestError') {
     return res.status((err as RequestError).status).send({
       message: err.message,
