@@ -32,7 +32,7 @@ async function isCurrentEventActive(): Promise<boolean> {
   if (eventCached) { // se o evento ja existe em cache, retorna
     const event = JSON.parse(eventCached) as Event;
     const { now, eventStartsAt, eventEndsAt } = getNowAndEventLimits(event);
-
+    
     return now.isAfter(eventStartsAt) && now.isBefore(eventEndsAt);
   }
 
