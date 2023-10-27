@@ -23,7 +23,7 @@ async function findByUserId(userId: number) {
 
 async function countBookingsByRoomId(roomId: number) {
   return prisma.booking.count({
-    where: { roomId }
+    where: { roomId },
   });
 }
 

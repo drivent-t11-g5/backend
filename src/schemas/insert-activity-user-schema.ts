@@ -1,11 +1,11 @@
-import joi from "joi";
+import joi from 'joi';
 
 type bodyActivityUser = {
-    activityId: number
-}
+  activityId: number;
+};
 
 const userActivitySchema = joi.object<bodyActivityUser>({
-    activityId: joi.number().required()
-})
+  activityId: joi.number().required(),
+});
 
 export default userActivitySchema;
