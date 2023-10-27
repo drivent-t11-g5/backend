@@ -7,6 +7,7 @@ import { cleanDb } from '../helpers';
 import { duplicatedEmailError } from '@/errors';
 import app, { init } from '@/app';
 import { prisma } from '@/config';
+import redis from '@/config/redis';
 
 beforeAll(async () => {
   await init();
@@ -55,6 +56,8 @@ describe('POST /users', () => {
 
     describe('when event started', () => {
       beforeAll(async () => {
+        await redis.del("eventKey");
+        await redis.del("activeEventKey");
         await prisma.event.deleteMany({});
         await createEvent();
       });

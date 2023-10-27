@@ -26,7 +26,7 @@ async function getFirstEvent(): Promise<GetFirstEventResult> {
 export type GetFirstEventResult = Omit<Event, 'createdAt' | 'updatedAt'>;
 
 async function isCurrentEventActive(): Promise<boolean> {
-  const activeEventCacheKey = "eventKey";
+  const activeEventCacheKey = "activeEventKey";
   const eventCached = await redis.get(activeEventCacheKey);
 
   if (eventCached) { // se o evento ja existe em cache, retorna
