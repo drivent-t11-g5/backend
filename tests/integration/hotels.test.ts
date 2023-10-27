@@ -129,6 +129,8 @@ describe('GET /hotels', () => {
       expect(response.body).toEqual([
         {
           id: createdHotel.id,
+          acomodation: expect.any(Array),
+          availableBookings: expect.any(Number),
           name: createdHotel.name,
           image: createdHotel.image,
           createdAt: createdHotel.createdAt.toISOString(),

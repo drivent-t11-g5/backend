@@ -2,6 +2,7 @@ import { TicketStatus } from '@prisma/client';
 import { invalidDataError, notFoundError } from '@/errors';
 import { cannotListHotelsError } from '@/errors/cannot-list-hotels-error';
 import { bookingRepository, enrollmentRepository, hotelRepository, ticketsRepository } from '@/repositories';
+import redis, { DEFAULT_EXP } from '@/config/redis';
 
 async function validateUserBooking(userId: number) {
   const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
@@ -20,7 +21,14 @@ async function validateUserBooking(userId: number) {
 async function getHotels(userId: number) {
   await validateUserBooking(userId);
 
-  const hotels = await hotelRepository.findHotels();
+  const hotelsCacheKey = `getHotelsKey/User-${userId}`;
+  const hotelsCached = await redis.get(hotelsCacheKey);
+
+  if (hotelsCached) { // se existem hoteis na cache, retorna
+    return JSON.parse(hotelsCached);
+  }
+
+  const hotels = await hotelRepository.findHotels(); // senão busca do postgreSQL, insere no redis e retorna
   if (hotels.length === 0) throw notFoundError();
   
   const hotelsInfo = [];
@@ -42,11 +50,20 @@ async function getHotels(userId: number) {
     hotelsInfo.push({...hotels[i], availableBookings, acomodation})
   }
 
+  await redis.setEx(hotelsCacheKey, DEFAULT_EXP, JSON.stringify(hotelsInfo))
+
   return hotelsInfo;
 }
 
 async function getHotelsWithRooms(userId: number, hotelId: number) {
   await validateUserBooking(userId);
+
+  const hotelsCacheKey = `getHotelsWithRoomsKey/User-${userId}Hotel-${hotelId}`;
+  const hotelsCached = await redis.get(hotelsCacheKey);
+
+  if (hotelsCached) { // se existem hoteis na cache, retorna
+    return JSON.parse(hotelsCached);
+  }
 
   if (!hotelId || isNaN(hotelId)) throw invalidDataError('hotelId');
 
@@ -61,7 +78,11 @@ async function getHotelsWithRooms(userId: number, hotelId: number) {
     roomsList.push(roomWithAvailableSpace);
   }
 
-  return { ...hotelWithRooms, Rooms: roomsList };
+  const hotelAndRooms = { ...hotelWithRooms, Rooms: roomsList };
+
+  await redis.setEx(hotelsCacheKey, DEFAULT_EXP, JSON.stringify(hotelAndRooms));
+
+  return hotelAndRooms;
 }
 
 export const hotelsService = {
