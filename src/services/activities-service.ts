@@ -2,7 +2,6 @@ import { NotAcceptable, notFoundError, paymentRequiredError } from '@/errors';
 import { enrollmentRepository, ticketsRepository } from '@/repositories';
 import activitiesRepository from '@/repositories/activities-repository';
 
-
 // Adicionei interfaces para representar os tipos dos dados envolvidos
 interface OccupiedSeat {
   activityId: number;
@@ -23,7 +22,7 @@ interface ActivityWithOccupiedSeats {
 }
 
 async function getActivities(userId: number): Promise<ActivityWithOccupiedSeats[]> {
-  const enrollment = await enrollmentRepository.findWithAddressByUserId(userId)
+  const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
   const ticket = await ticketsRepository.findTicketByEnrollmentId(enrollment.id);
   if (!ticket) {
     throw paymentRequiredError();
@@ -44,10 +43,12 @@ async function getActivities(userId: number): Promise<ActivityWithOccupiedSeats[
     occupiedSeatsMap[item.activityId] = item._count.activityId;
   });
 
-  const activitiesWithOccupiedSeats = activities.map((activity: Activity): ActivityWithOccupiedSeats => ({
-    ...activity,
-    occupiedSeats: occupiedSeatsMap[activity.id] || 0,
-  }));
+  const activitiesWithOccupiedSeats = activities.map(
+    (activity: Activity): ActivityWithOccupiedSeats => ({
+      ...activity,
+      occupiedSeats: occupiedSeatsMap[activity.id] || 0,
+    }),
+  );
 
   return activitiesWithOccupiedSeats;
 }

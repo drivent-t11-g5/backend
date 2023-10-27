@@ -1,7 +1,7 @@
-import { ApplicationError } from "@/protocols";
+import { ApplicationError } from '@/protocols';
 
 export function NotAcceptable(): ApplicationError {
-  return {  
+  return {
     name: 'NotAcceptable',
     message: 'Not Acceptable for this ticket',
   };

@@ -13,21 +13,21 @@ async function getOccupiedSeats() {
   });
 }
 
-async function getActivity(activityId: number){
+async function getActivity(activityId: number) {
   return await prisma.activities.findUnique({
-    where: { id: activityId }
-  })
+    where: { id: activityId },
+  });
 }
 
-async function createRegisterActivity(userId: number, activityId: number){
+async function createRegisterActivity(userId: number, activityId: number) {
   return await prisma.activitiesUser.create({
     data: {
       userId,
-      activityId
-    }
-  })
+      activityId,
+    },
+  });
 }
 
-const activitiesRepository = {getActivities, getOccupiedSeats, createRegisterActivity, getActivity};
+const activitiesRepository = { getActivities, getOccupiedSeats, createRegisterActivity, getActivity };
 
 export default activitiesRepository;

@@ -53,5 +53,4 @@ export const ticketsRepository = {
   createTicket,
   findTicketById,
   ticketProcessPayment,
-
 };
