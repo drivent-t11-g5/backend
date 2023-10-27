@@ -3,8 +3,11 @@ import { User } from '@prisma/client';
 import { createUser } from './factories';
 import { createSession } from './factories/sessions-factory';
 import { prisma } from '@/config';
+import redis from '@/config/redis';
 
 export async function cleanDb() {
+  await redis.flushAll(); // limpa o cache para o funcionamento dos testes
+
   await prisma.address.deleteMany({});
   await prisma.payment.deleteMany({});
   await prisma.ticket.deleteMany({});
