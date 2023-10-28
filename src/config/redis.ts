@@ -11,4 +11,8 @@ const redis = createClient({
     await redis.connect();
 })();
 
+export async function disconnectRedis() {
+    await redis.disconnect();
+}
+
 export default redis;

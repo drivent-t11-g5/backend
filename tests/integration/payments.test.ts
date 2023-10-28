@@ -12,8 +12,9 @@ import {
   generateCreditCardData,
 } from '../factories';
 import { cleanDb, generateValidToken } from '../helpers';
-import { prisma } from '@/config';
+import { disconnectDB, prisma } from '@/config';
 import app, { init } from '@/app';
+import { disconnectRedis } from '@/config/redis';
 
 beforeAll(async () => {
   await init();
@@ -21,6 +22,11 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   await cleanDb();
+});
+
+afterAll(async () => {
+  await disconnectDB();
+  await disconnectRedis();
 });
 
 const server = supertest(app);
@@ -199,7 +205,7 @@ describe('POST /payments/process', () => {
 
       const body = { ticketId: ticket.id, cardData: generateCreditCardData() };
 
-      const response = await server.post('/payments/process').set('Authorization', `Bearer ${token}`).send(body);
+      const response = await server.post('/payments/process').set('Authorization', `Bearer ${token}`).send(body);      
 
       expect(response.status).toEqual(httpStatus.OK);
       expect(response.body).toEqual({

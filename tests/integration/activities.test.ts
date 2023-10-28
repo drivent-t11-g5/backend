@@ -16,6 +16,8 @@ import app, { init } from '@/app';
 import supertest from 'supertest';
 import { TicketStatus } from '@prisma/client';
 import { createActivity } from '../factories/activities-factory';
+import { disconnectDB } from '@/config';
+import { disconnectRedis } from '@/config/redis';
 
 beforeAll(async () => {
   await init();
@@ -23,6 +25,11 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   await cleanDb();
+});
+
+afterAll(async () => {
+  await disconnectDB();
+  await disconnectRedis();
 });
 
 const server = supertest(app);
