@@ -1,9 +1,10 @@
-import { Address, Enrollment } from '@prisma/client';
+import { Address, Enrollment, PrismaPromise } from '@prisma/client';
 import { request } from '@/utils/request';
 import { enrollmentNotFoundError, invalidCepError } from '@/errors';
 import { addressRepository, CreateAddressParams, enrollmentRepository, CreateEnrollmentParams } from '@/repositories';
 import { exclude } from '@/utils/prisma-utils';
 import { AddressEnrollment } from '@/protocols';
+import { prisma } from '@/config';
 
 async function getAddressFromCEP(cep: string): Promise<AddressEnrollment> {
   const result = await request.get(`${process.env.VIA_CEP_API}/${cep}/json/`);
