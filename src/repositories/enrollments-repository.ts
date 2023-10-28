@@ -24,42 +24,10 @@ async function upsert(
   });
 }
 
-async function upsertEnrollmentandAdress(
-  userId: number,
-  createdEnrollment: CreateEnrollmentParams,
-  updatedEnrollment: UpdateEnrollmentParams,
-  createdAddress: CreateAddressParams, 
-  updatedAddress: UpdateAddressParams
-) {
-  return prisma.$transaction((async (tx: PrismaClient) => {
-      const newEnrollment = await tx.enrollment.upsert({
-        where: {
-          userId,
-        },
-        create: createdEnrollment,
-        update: updatedEnrollment,
-      });
-
-      tx.address.upsert({
-        where: {
-          enrollmentId: newEnrollment.id,
-        },
-        create: {
-          ...createdAddress,
-          Enrollment: { connect: { id: newEnrollment.id } },
-        },
-        update: updatedAddress,
-      });
-    }) as unknown as PrismaPromise<any>[]);
-}
-
 export type CreateEnrollmentParams = Omit<Enrollment, 'id' | 'createdAt' | 'updatedAt'>;
 export type UpdateEnrollmentParams = Omit<CreateEnrollmentParams, 'userId'>;
-export type CreateAddressParams = Omit<Address, 'id' | 'createdAt' | 'updatedAt' | 'enrollmentId'>;
-export type UpdateAddressParams = CreateAddressParams;
 
 export const enrollmentRepository = {
   findWithAddressByUserId,
   upsert,
-  upsertEnrollmentandAdress,
 };
