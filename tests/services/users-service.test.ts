@@ -3,13 +3,19 @@ import bcrypt from 'bcrypt';
 import { createUser as createUserSeed, createEvent as createEventSeed } from '../factories';
 import { cleanDb } from '../helpers';
 import { init } from '@/app';
-import { prisma } from '@/config';
+import { disconnectDB, prisma } from '@/config';
 import { userService } from '@/services';
 import { duplicatedEmailError } from '@/errors';
+import { disconnectRedis } from '@/config/redis';
 
 beforeAll(async () => {
   await init();
   await cleanDb();
+});
+
+afterAll(async () => {
+  await disconnectDB();
+  await disconnectRedis();
 });
 
 describe('createUser', () => {

@@ -1,4 +1,4 @@
-import { Enrollment } from '@prisma/client';
+import { Address, Enrollment, PrismaClient, PrismaPromise } from '@prisma/client';
 import { prisma } from '@/config';
 
 async function findWithAddressByUserId(userId: number) {

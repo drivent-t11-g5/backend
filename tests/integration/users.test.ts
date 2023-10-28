@@ -6,12 +6,17 @@ import { createEvent, createUser } from '../factories';
 import { cleanDb } from '../helpers';
 import { duplicatedEmailError } from '@/errors';
 import app, { init } from '@/app';
-import { prisma } from '@/config';
-import redis from '@/config/redis';
+import { disconnectDB, prisma } from '@/config';
+import redis, { disconnectRedis } from '@/config/redis';
 
 beforeAll(async () => {
   await init();
   await cleanDb();
+});
+
+afterAll(async () => {
+  await disconnectDB();
+  await disconnectRedis();
 });
 
 const server = supertest(app);
