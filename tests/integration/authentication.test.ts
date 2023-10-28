@@ -4,10 +4,17 @@ import supertest from 'supertest';
 import { createUser } from '../factories';
 import { cleanDb } from '../helpers';
 import app, { init } from '@/app';
+import { disconnectDB } from '@/config';
+import { disconnectRedis } from '@/config/redis';
 
 beforeAll(async () => {
   await init();
   await cleanDb();
+});
+
+afterAll(async () => {
+  await disconnectDB();
+  await disconnectRedis();
 });
 
 const server = supertest(app);

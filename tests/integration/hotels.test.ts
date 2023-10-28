@@ -7,6 +7,8 @@ import { createEnrollmentWithAddress, createPayment, createTicket, createTicketT
 import { cleanDb, generateValidToken } from '../helpers';
 import { createHotel, createRoomWithHotelId } from '../factories/hotels-factory';
 import app, { init } from '@/app';
+import { disconnectRedis } from '@/config/redis';
+import { disconnectDB } from '@/config';
 
 beforeAll(async () => {
   await init();
@@ -14,6 +16,11 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   await cleanDb();
+});
+
+afterAll(async () => {
+  await disconnectDB();
+  await disconnectRedis();
 });
 
 const server = supertest(app);

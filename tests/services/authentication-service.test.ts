@@ -1,14 +1,20 @@
 import faker from '@faker-js/faker';
 import { createUser } from '../factories';
 import { cleanDb } from '../helpers';
-import { prisma } from '@/config';
+import { disconnectDB, prisma } from '@/config';
 import { init } from '@/app';
 import { authenticationService } from '@/services';
 import { invalidCredentialsError } from '@/errors';
+import { disconnectRedis } from '@/config/redis';
 
 beforeAll(async () => {
   await init();
   await cleanDb();
+});
+
+afterAll(async () => {
+  await disconnectDB();
+  await disconnectRedis();
 });
 
 describe('signIn', () => {

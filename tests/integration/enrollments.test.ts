@@ -7,12 +7,18 @@ import supertest from 'supertest';
 
 import { createEnrollmentWithAddress, createUser, createhAddressWithCEP } from '../factories';
 import { cleanDb, generateValidToken } from '../helpers';
-import { prisma } from '@/config';
+import { disconnectDB, prisma } from '@/config';
 import app, { init } from '@/app';
+import { disconnectRedis } from '@/config/redis';
 
 beforeAll(async () => {
   await init();
   await cleanDb();
+});
+
+afterAll(async () => {
+  await disconnectDB();
+  await disconnectRedis();
 });
 
 const server = supertest(app);
