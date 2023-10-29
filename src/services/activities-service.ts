@@ -19,6 +19,7 @@ interface ActivityWithOccupiedSeats {
   id: number;
   // Adicione outras propriedades da atividade aqui conforme necessário
   occupiedSeats: number;
+  subscribed: boolean;
 }
 
 async function getActivities(userId: number): Promise<ActivityWithOccupiedSeats[]> {
@@ -43,11 +44,14 @@ async function getActivities(userId: number): Promise<ActivityWithOccupiedSeats[
     occupiedSeatsMap[item.activityId] = item._count.activityId;
   });
 
-  const activitiesWithOccupiedSeats = activities.map(
-    (activity: Activity): ActivityWithOccupiedSeats => ({
-      ...activity,
-      occupiedSeats: occupiedSeatsMap[activity.id] || 0,
-    }),
+  const activitiesWithOccupiedSeats = await Promise.all(
+    activities.map(
+      async (activity: Activity): Promise<ActivityWithOccupiedSeats> => ({
+        ...activity,
+        occupiedSeats: occupiedSeatsMap[activity.id] || 0,
+        subscribed: await activitiesRepository.isUserSubscribed(userId, activity.id),
+      }),
+    ),
   );
 
   return activitiesWithOccupiedSeats;
@@ -57,9 +61,32 @@ async function postActivityToUser(userId: number, activityId: number): Promise<a
   const activity = await activitiesRepository.getActivity(activityId);
   if (!activity) throw notFoundError();
 
+  const userActivities = await activitiesRepository.getUserActivities(userId);
+
+  const newActivityStartTime = activity.startTime;
+  const newActivityEndTime = activity.endTime;
+
+  const hasTimeConflict = userActivities.some((userActivity) => {
+    const existingActivityStartTime = userActivity.Activities.startTime;
+    const existingActivityEndTime = userActivity.Activities.endTime;
+
+    if (
+      (newActivityStartTime >= existingActivityStartTime && newActivityStartTime < existingActivityEndTime) ||
+      (newActivityEndTime > existingActivityStartTime && newActivityEndTime <= existingActivityEndTime) ||
+      (newActivityStartTime <= existingActivityStartTime && newActivityEndTime >= existingActivityEndTime)
+    ) {
+      return true;
+    }
+
+    return false;
+  });
+
+  if (hasTimeConflict) throw NotAcceptable();
+
   const response = await activitiesRepository.createRegisterActivity(userId, activityId);
   return response;
 }
+
 
 const activitiesService = { getActivities, postActivityToUser };
 

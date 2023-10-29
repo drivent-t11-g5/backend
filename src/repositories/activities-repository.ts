@@ -28,6 +28,23 @@ async function createRegisterActivity(userId: number, activityId: number) {
   });
 }
 
-const activitiesRepository = { getActivities, getOccupiedSeats, createRegisterActivity, getActivity };
+async function isUserSubscribed(userId: number, activityId: number){
+  const response = await prisma.activitiesUser.findFirst({
+    where: {
+      userId, activityId
+    }
+  })
+  if (!response) return false;
+  return true;
+}
+
+async function getUserActivities(userId: number){
+  return await prisma.activitiesUser.findMany({
+    where:{userId},
+    include: {Activities: true}
+  });
+}
+
+const activitiesRepository = { getActivities, getOccupiedSeats, createRegisterActivity, getActivity, isUserSubscribed, getUserActivities };
 
 export default activitiesRepository;
