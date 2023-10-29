@@ -12,3 +12,10 @@ export async function usersPost(req: Request, res: Response) {
     email: user.email,
   });
 }
+
+export async function upsertGitHubUser(req: Request, res: Response) {
+  const { code } = req.body;
+  const { email } = await userService.loginWithGitHub(code);
+  const result = await userService.upsertGitHubUser(email);
+  return res.status(httpStatus.OK).send(result);
+}

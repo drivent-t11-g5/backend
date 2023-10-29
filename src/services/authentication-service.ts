@@ -27,7 +27,7 @@ async function getUserOrFail(email: string): Promise<GetUserOrFailResult> {
   return user;
 }
 
-async function createSession(userId: number) {
+export async function createSession(userId: number) {
   const token = jwt.sign({ userId }, process.env.JWT_SECRET);
   await authenticationRepository.createSession({
     token,
